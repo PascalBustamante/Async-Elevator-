@@ -1,60 +1,42 @@
 import time
-import queue
 import asyncio
 from enum import Enum
-
-class direction(Enum):
-    up = 1
-    stationary = 0
-    down = -1
-
-class elevator(object):
-    def __init__(self) -> None:
-        self.currentFloor = 0
-        self.towards = 0
-    
-
-class Controller(object):
-    floors = 5 #including 0
-
-q = queue.Queue()
-#add inputs into queue
-#might need 2 queues to seperate the outside and inside calls
-
-while q.empty() == False: #not sure if this even works or is needed (the != bit)
-    f = q.get() #should be an int 0-5 
-    async def elevatorMovement(delay, queue): #if we put the queue here we must add the loop that fills the calls in the list, the other way would be to have it outside and just put floor
-        #first check direction
-        #check 1s in the direction first
-        #if going up
-        #most of what is happening below we can place it as a method 
-        if direction == 1: #not right
-            while 1 in calls:
-                if elevatorFloor != 5:
-                    elevatorFloor += 1
-                    calls[elevatorFloor] = 0
-                else: #change direction to 0 or -1
-                    test = 1 
-                while queue.empty() == False:
-                    f = queue.get()
-                    calls[f] = 1
-        if direction == -1: #not right
-            while 1 in calls:
-                if elevatorFloor != 0:
-                    elevatorFloor -= 1
-                    calls[elevatorFloor] = 0
-                else: #change direction to 0 or -1
-                    test = 1 
-                while queue.empty() == False:
-                    f = queue.get()
-                    if f != elevatorFloor:
-                        calls[f] = 1
-        
+from elevator import Elevator
+from controller import Navigator
 
 
-elevatorFloor = 0
-elevatorDirection = 0
-calls = [0,0,0,0,0,0]
-#outSideCalls = [0,0,0,0,0,0]
-#inSideCalls = [0,0,0,0,0,0]
+q = asyncio.Queue()
+elevator1 = Elevator()
+controller = Navigator() 
+while True:
+    userInput = asyncio.ensure_future(input("enter a floor and direction as a tuple")) #they'll come in as lists (floor, [up=1, down=-1, in=0])
+    q.put(userInput)
+
+    while q.empty() != False:
+        r = q.get()
+        if r[2] == 1:
+            Navigator.upCalls[r[1]] = 1
+        elif r[2] == -1:
+            Navigator.downCalls[r[1]] = 1
+        else:
+            Navigator.inCalls[r[1]] =1
+    out = Navigator.checkCalls(Navigator.upCalls, Navigator.downCalls, Navigator.inCalls)
+    if out == 1:
+        Navigator.movementBetweenFloors(5,elevator1)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
