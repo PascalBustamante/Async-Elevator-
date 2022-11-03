@@ -1,4 +1,4 @@
-# Async Elevator
+# Graphs.py
 
 # Set-up
 Requieres iapws and matplotlib packages, both available in PyPi. If you havn't already you should be using a virual enviroment to manage python packeges in a per project basis, [this link](https://docs.python.org/3/library/venv.html) is a great guide in doing so. 
