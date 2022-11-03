@@ -1,44 +1,45 @@
 # Async Elevator
 
-# Classes:
+# Set-up
+Requieres iapws and matplotlib packages, both available in PyPi. If you havn't already you should be using a virual enviroment to manage python packeges in a per project basis, [this link](https://docs.python.org/3/library/venv.html) is a great guide in doing so. 
+> **_NOTE:_**  Setting-up a virtual enviroment is recommended, but not required. Also dont forget to activate your virtual enviroment:
+> ```python
+> C:\> <venv>\Scripts\activate
+> ```
+After you have set up your virtual enviroment you'll need to do the pip installs:
+```python
+C:\> pip3 install iapws
+C:\> pip3 install matplotlib
+```
+Be sure to place this code inside the folder with the data that you want to process.
 
-## Event Classes
-They are there to seperate the inputs coming in from the button methods in the Elevator class.
-## Elevator 
-
-It initializes the elevator controller class and has all the "public" methods attached to it. 
-
-## ElevatorController
-
-Has all the logic and "private" methods. Contains 3 lists outside_down, inside and outside_up with 6 indexes each to simulate the floors and the buttons. A 0 in these lists imply no call has been made while a 1 tells the elevator it needs to service that floor.
-
-# Methods:
-
-## Elevator Methods:
-
-The inputs from the elevator class are passed to the ElevatorControll class via the button methods. These take the inputs, create their corresponding events and places them into the queue. 
-
-## ElevatorControll Methods:
-
-###### The 3 button methods (up_button, down_button and inside_button)
-They place the inputs coming in from the button methods in the Elevator class and places them into the queue.
-
-###### should_stop 
-Checks to see if there has been a call in the floor the elevator is on, it also takes into account the direction of the elevator when stopping for outside calls.
-
-###### move_up and move_down 
-Move up or down the elevator as well as simulate the elevator movement by waiting for 5 seconds.
-
-###### has_action 
-Checks if there are any calls that the elevator needs to service. It is used in the run method to start a loop.
-
-###### run 
-First checks the has_action method to see if it needs to start the elevator. Then checks to see the direction of the elevator, then if it needs to service the floor it is currently in (if it does this is where the 5 seconds of wait to service the floor are simulated). Then checks if there any calls in the direction of the elevator. If there are any it moves towards them, if not it changes direction.
-
-###### input_loop
-Checks for calls continiously (via the queue_task below). Takes the inputs from the queue and assigns them to their corresponding lists. Finally it also creats a task for the run method above.
-
-###### queue_task 
-Creates a task for 
-
-
+# Possible issues
+  There is a bug when when inputing a path to a directory with .csv files other then the data we want. There are ways around this but without knowing more about naming conventions and how people store their data I decided to keep it as encompasing as possible. The solution is to have a seprate directory for these data files. 
+  
+  
+## Runnig the code
+When you run the code it'll ask you to input the path to the folder where the data is located, if no input is provided it will default to a relative path (meaning inside the same folder the code is in). 
+  
+##Functions 
+  ### get_path()
+  Returns a list of all paths to the data. It requests the user to input a path to the directory containing the data, if no input is given it will default to the current one and fetch all relative paths of all .csv files starting with 'OperationData_201'. This can lead to bugs if there are other .csv files in the directory.
+  ### get_quarters(files)
+  Has parameter files which should be a list of paths directing to the .csv files. Returns a list of yearly quarters (combines 3 files to make a quarter). It filters the rows and only adds those who's temperature is over 1000F and power is over 30MW.
+  ### bar_chart_data(quarters)
+  Takes the parameter quarters which should be a list of lists seperating the data into yearly quarters. The quarters are parsed by temperature, by segments of 50F each. Returns the y-axis of for the bar charts, in this case a set of 3 bars for each quarter. These bars are normalized to be per hour and values below 5 hours are deleted. At the end there is a check to see if there are any null bars and deleted. 
+  
+  ### bar_chart(bar_chart_data)
+  Takes the parameter bar_chart_data which should be a list of bars containing the amount of time in hours that a the equipment has been online for at a temperature range. The position of the values in the bars corresponds to a specific quarter. Here the perameters for the graph are set and returns a container from matplotlib.
+  
+  ### calc_steam(quarters)
+  Takes the parameter quarters and parses it for rows fitting the given constraints. Then it uses IAPWS97 to calculate the enthalpy for a given row. Returns an enthalpy array containg (time, enthalpy, color). The color is calculated based of the temperature of each row. 
+  
+  ### sca_graph(enthalpy_ar)
+  takes the output of the last function and genrates a scater plot with colour based on the temperature of the given row. 
+  
+  # References
+  https://matplotlib.org/stable/index.html
+  https://docs.python.org/3/library/venv.html
+  https://iapws.readthedocs.io/en/latest/modules.html#documentation
+  
+  
